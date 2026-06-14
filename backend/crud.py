@@ -192,3 +192,67 @@ def get_owners_with_specific_lastname(db: Session):
         for r in result
     ]
 
+def get_owners_lastname_starts_with_i(db: Session):
+    result = (
+        db.query(
+            models.Owner.id,
+            models.Owner.first_name,
+            models.Owner.last_name,
+            models.Owner.birth_date,
+        )
+        .filter(models.Owner.last_name.like('И%'))
+        .all()
+    )
+    return [
+        {
+            "id": r[0],
+            "first_name": r[1],
+            "last_name": r[2],
+            "birth_date": r[3].isoformat() if r[3] else None,
+        }
+        for r in result
+    ]
+
+def get_owners_lastname_ivano_sorted_by_age(db: Session):
+    result = (
+        db.query(
+            models.Owner.id,
+            models.Owner.first_name,
+            models.Owner.last_name,
+            models.Owner.birth_date,
+        )
+        .filter(models.Owner.last_name.like('Ивано%'))
+        .order_by(desc(models.Owner.birth_date))
+        .all()
+    )
+    return [
+        {
+            "id": r[0],
+            "first_name": r[1],
+            "last_name": r[2],
+            "birth_date": r[3].isoformat() if r[3] else None,
+        }
+        for r in result
+    ]
+
+def get_expansion_locations(db: Session):
+    results = (
+        db.query(
+            models.Place.location,
+            func.count(models.Move.id).label('moves_count'),
+            func.avg(models.Place.scale).label('avg_scale'),
+        )
+        .join(models.Move, models.Move.place_id == models.Place.id)
+        .group_by(models.Place.location)
+        .having(func.count(models.Move.id) > 5)
+        .all()
+    )
+    return [
+        {
+            "location": r[0],
+            "moves_count": r[1],
+            "avg_scale": round(r[2], 2) if r[2] is not None else 0,
+        }
+        for r in results
+    ]
+

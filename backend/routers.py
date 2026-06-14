@@ -210,3 +210,21 @@ def get_owners_with_specific_lastname(db: Session = Depends(get_db)):
     if result is None:
         raise HTTPException(status_code=404, detail="Таких фамилий нет")
     return create_response_with_sql(result)
+
+@router.get("/analytics/task8/owners-simple", tags=["📊 Аналитика"])
+def task8_owners_simple(db: Session = Depends(get_db)):
+    """Задание 8 (простой): владельцы с фамилией, начинающейся на «И»"""
+    result = crud.get_owners_lastname_starts_with_i(db)
+    return create_response_with_sql(result)
+
+@router.get("/analytics/task8/owners-advanced", tags=["📊 Аналитика"])
+def task8_owners_advanced(db: Session = Depends(get_db)):
+    """Задание 8 (продвинутый): владельцы с фамилией на «Ивано», от младшего к старшему"""
+    result = crud.get_owners_lastname_ivano_sorted_by_age(db)
+    return create_response_with_sql(result)
+
+@router.get("/analytics/task8/expansion-locations", tags=["📊 Аналитика"])
+def task8_expansion_locations(db: Session = Depends(get_db)):
+    """Задание 8 (продвинутый): перспективные площадки для экспансии рекламных кампаний"""
+    result = crud.get_expansion_locations(db)
+    return create_response_with_sql(result)
